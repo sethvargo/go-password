@@ -1,0 +1,16 @@
+dist: trusty
+sudo: false
+
+language: go
+
+go:
+  - 1.9
+
+env:
+  - GOMAXPROCS=4
+
+branches:
+  only:
+    - master
+
+script: make test test-race
