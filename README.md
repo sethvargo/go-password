@@ -10,6 +10,16 @@ passwords.
 
 The library uses crypto/rand for added randomness.
 
+Sample example passwords this library may generate:
+
+```text
+0N[k9PhDqmmfaO`p_XHjVv`HTq|zsH4XiH8umjg9JAGJ#\Qm6lZ,28XF4{X?3sHj
+7@90|0H7!4p\,c<!32:)0.9N
+UlYuRtgqyWEivlXnLeBpZvIQ
+Q795Im1VR5h363s48oZGaLDa
+wpvbxlsc
+```
+
 ## Installation
 
 ```sh
