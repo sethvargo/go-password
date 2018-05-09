@@ -24,7 +24,7 @@ wpvbxlsc
 ## Installation
 
 ```sh
-$ go -u get github.com/sethvargo/password
+$ go get -u github.com/sethvargo/go-password/password
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ $ go -u get github.com/sethvargo/password
 package main
 
 import (
-  "strings"
+  "log"
 
   "github.com/sethvargo/go-password/password"
 )
