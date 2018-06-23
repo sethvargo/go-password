@@ -7,6 +7,7 @@
 //    }
 //    log.Printf(res)
 //
+// Most functions are safe for concurrent use.
 package password
 
 import (
@@ -48,6 +49,57 @@ var (
 	ErrSymbolsExceedsAvailable = errors.New("number of symbols exceeds available symbols and repeats are not allowed")
 )
 
+// Generator is the stateful generator which can be used to customize the list
+// of letters, digits, and/or symbols.
+type Generator struct {
+	lowerLetters string
+	upperLetters string
+	digits       string
+	symbols      string
+}
+
+// GeneratorInput is used as input to the NewGenerator function.
+type GeneratorInput struct {
+	LowerLetters string
+	UpperLetters string
+	Digits       string
+	Symbols      string
+}
+
+// NewGenerator creates a new Generator from the specified configuration. If no
+// input is given, all the default values are used. This function is safe for
+// concurrent use.
+func NewGenerator(i *GeneratorInput) (*Generator, error) {
+	if i == nil {
+		i = new(GeneratorInput)
+	}
+
+	g := &Generator{
+		lowerLetters: i.LowerLetters,
+		upperLetters: i.UpperLetters,
+		digits:       i.Digits,
+		symbols:      i.Symbols,
+	}
+
+	if g.lowerLetters == "" {
+		g.lowerLetters = LowerLetters
+	}
+
+	if g.upperLetters == "" {
+		g.upperLetters = UpperLetters
+	}
+
+	if g.digits == "" {
+		g.digits = Digits
+	}
+
+	if g.symbols == "" {
+		g.symbols = Symbols
+	}
+
+	return g, nil
+}
+
 // Generate generates a password with the given requirements. length is the
 // total number of characters in the password. numDigits is the number of digits
 // to include in the result. numSymbols is the number of symbols to include in
@@ -55,11 +107,11 @@ var (
 // allows characters to repeat.
 //
 // The algorithm is fast, but it's not designed to be performant; it favors
-// entropy over speed.
-func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
-	letters := LowerLetters
+// entropy over speed. This function is safe for concurrent use.
+func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
+	letters := g.lowerLetters
 	if !noUpper {
-		letters += UpperLetters
+		letters += g.upperLetters
 	}
 
 	chars := length - numDigits - numSymbols
@@ -71,11 +123,11 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 		return "", ErrLettersExceedsAvailable
 	}
 
-	if !allowRepeat && numDigits > len(Digits) {
+	if !allowRepeat && numDigits > len(g.digits) {
 		return "", ErrDigitsExceedsAvailable
 	}
 
-	if !allowRepeat && numSymbols > len(Symbols) {
+	if !allowRepeat && numSymbols > len(g.symbols) {
 		return "", ErrSymbolsExceedsAvailable
 	}
 
@@ -101,7 +153,7 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 
 	// Digits
 	for i := 0; i < numDigits; i++ {
-		d, err := randomElement(Digits)
+		d, err := randomElement(g.digits)
 		if err != nil {
 			return "", err
 		}
@@ -119,7 +171,7 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 
 	// Symbols
 	for i := 0; i < numSymbols; i++ {
-		sym, err := randomElement(Symbols)
+		sym, err := randomElement(g.symbols)
 		if err != nil {
 			return "", err
 		}
@@ -139,6 +191,25 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 }
 
 // MustGenerate is the same as Generate, but panics on error.
+func (g *Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
+	res, err := g.Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
+// See Generator.Generate for usage.
+func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
+	gen, err := NewGenerator(nil)
+	if err != nil {
+		return "", err
+	}
+
+	return gen.Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+}
+
+// See Generator.MustGenerate for usage.
 func MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
 	res, err := Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
 	if err != nil {
