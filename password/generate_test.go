@@ -107,9 +107,6 @@ func TestGenerate(t *testing.T) {
 
 	t.Run("gen_no_repeats", func(t *testing.T) {
 		t.Parallel()
-		// make sure the default symbol set is active or the
-		// numSymbols argument will cause a lot of failed test
-		SetSymbolSetDefault()
 
 		for i := 0; i < 10000; i++ {
 			res, err := Generate(52, 10, 29, false, false)
