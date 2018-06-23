@@ -48,6 +48,27 @@ func TestGenerate(t *testing.T) {
 		}
 	})
 
+	t.Run("contains_no_unwanted_characters", func(t *testing.T) {
+		// these tests can't be run in Parallel due to the toggle
+		SetSymbolSetAlternate()
+		unwantedCharacters := "~`\\:\"<>?,./"
+		for i := 0; i < 100; i++ {
+			pass, err := Generate(40, 9, 20, false, false)
+			if err != nil {
+				t.Errorf("error generating passord '%q'", err)
+			}
+			if strings.ContainsAny(pass, unwantedCharacters) {
+				t.Errorf(
+					"password '%s' contains one or more unwanted characters '%s'",
+					pass,
+					unwantedCharacters,
+				)
+			}
+		}
+		// set back to default so the other tests' arguments are valid
+		SetSymbolSetDefault()
+	})
+
 	t.Run("exceeds_symbols_available", func(t *testing.T) {
 		t.Parallel()
 
@@ -88,7 +109,7 @@ func TestGenerate(t *testing.T) {
 		t.Parallel()
 
 		for i := 0; i < 10000; i++ {
-			res, err := Generate(52, 10, 30, false, false)
+			res, err := Generate(52, 10, 29, false, false)
 			if err != nil {
 				t.Error(err)
 			}

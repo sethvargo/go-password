@@ -25,9 +25,6 @@ const (
 
 	// Digits is the list of permitted digits.
 	Digits = "0123456789"
-
-	// Symbols is the list of symbols.
-	Symbols = "~!@#$%^&*()_+`-={}|[]\\:\"<>?,./"
 )
 
 var (
@@ -46,7 +43,31 @@ var (
 	// ErrSymbolsExceedsAvailable is the error returned with the number of symbols
 	// exceeds the number of available symbols and repeats are not allowed.
 	ErrSymbolsExceedsAvailable = errors.New("number of symbols exceeds available symbols and repeats are not allowed")
+
+	// symbolSetDefault is a standard set of symbols.
+	symbolSetDefault = "~!@#$%^&*()_+`-={}|[]\\:\"<>?,./"
+
+	// symbolSetAlternate is an alternative list of symbols
+	// supported by systems such as AWS IAM
+	// which allows fewer special characters
+	symbolSetAlternate = "!@#$%^&*()_+-=[]{}|'"
+
+	// symbols holds the pointer to the SymbolSet that will be used during Generate
+	// and is not exported so the user cannot directly alter symbol sets
+	symbols = &symbolSetDefault
 )
+
+// SetSymbolSetAlternate changes the default symbol set to use the AWS IAM friendly
+// symbolSetAlternate of !@#$%^&*()_+-=[]{}|'
+func SetSymbolSetAlternate() {
+	symbols = &symbolSetAlternate
+}
+
+// SetSymbolSetDefault changes the default symbol set to use the symbolSetDefault
+// of ~!@#$%^&*()_+`-={}|[]\:"<>,./
+func SetSymbolSetDefault() {
+	symbols = &symbolSetDefault
+}
 
 // Generate generates a password with the given requirements. length is the
 // total number of characters in the password. numDigits is the number of digits
@@ -75,7 +96,7 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 		return "", ErrDigitsExceedsAvailable
 	}
 
-	if !allowRepeat && numSymbols > len(Symbols) {
+	if !allowRepeat && numSymbols > len(*symbols) {
 		return "", ErrSymbolsExceedsAvailable
 	}
 
@@ -117,9 +138,9 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 		}
 	}
 
-	// Symbols
+	// symbols
 	for i := 0; i < numSymbols; i++ {
-		sym, err := randomElement(Symbols)
+		sym, err := randomElement(*symbols)
 		if err != nil {
 			return "", err
 		}
