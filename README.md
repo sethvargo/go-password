@@ -52,11 +52,11 @@ func main() {
 Some systems don't accept all special characters. You can toggle back and forth between symbol sets like so:
 ```
 password.SetSymbolSetAlternate()
-res, _ := password.Generate(64, 10, 10, false, false)
+res, _ := password.Generate(44, 10, 10, false, false)
 log.Println(res)
 
 password.SetSymbolSetDefault()
-res, _ := password.Generate(64, 10, 10, false, false)
+res, _ := password.Generate(64, 10, 29, false, false)
 log.Println(res)
 ```
 
