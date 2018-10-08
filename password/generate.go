@@ -224,7 +224,7 @@ func randomInsert(s, val string) (string, error) {
 		return val, nil
 	}
 
-	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(s))))
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(s)+1)))
 	if err != nil {
 		return "", err
 	}
