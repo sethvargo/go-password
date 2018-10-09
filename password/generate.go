@@ -199,7 +199,7 @@ func (g *Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, all
 	return res
 }
 
-// See Generator.Generate for usage.
+// Generate is the package shortcut for Generator.Generate.
 func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
 	gen, err := NewGenerator(nil)
 	if err != nil {
@@ -209,7 +209,7 @@ func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (str
 	return gen.Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
 }
 
-// See Generator.MustGenerate for usage.
+// MustGenerate is the package shortcut for Generator.MustGenerate.
 func MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
 	res, err := Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
 	if err != nil {
