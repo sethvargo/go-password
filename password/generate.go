@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	// LowerLetters is the list of lowercase letters.
+	// This is the list of lowercase letters.
 	LowerLetters = "abcdefghijklmnopqrstuvwxyz"
 
 	// UpperLetters is the list of uppercase letters.
