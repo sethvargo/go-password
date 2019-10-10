@@ -52,6 +52,30 @@ func main() {
 See the [GoDoc](https://godoc.org/github.com/sethvargo/go-password) for more
 information.
 
+## Testing
+
+For testing purposes, instead of accepted a `*password.Generator` struct, accept
+a `password.PasswordGenerator` interface:
+
+```go
+// func MyFunc(p *password.Generator)
+func MyFunc(p password.PasswordGenerator) {
+  // ...
+}
+```
+
+Then, in tests, use a mocked password generator with stubbed data:
+
+```go
+func TestMyFunc(t *testing.T) {
+  gen := password.NewMockGenerator("canned-response", false)
+  MyFunc(gen)
+}
+```
+
+In this example, the mock generator will always return the value
+"canned-response", regardless of the provided parameters.
+
 ## License
 
 This code is licensed under the MIT license.
