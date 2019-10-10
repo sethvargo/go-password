@@ -240,7 +240,7 @@ func randomInsert(s, val string) (string, error) {
 		return "", err
 	}
 	i := n.Int64()
-	return s[0:i] + val + s[i:len(s)], nil
+	return s[0:i] + val + s[i:], nil
 }
 
 // randomElement extracts a random element from the given string.
