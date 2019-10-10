@@ -1,7 +1,6 @@
 package password
 
 import (
-	"log"
 	"strings"
 	"testing"
 )
@@ -144,54 +143,4 @@ func TestGenerator_Generate_Custom(t *testing.T) {
 			t.Errorf("%q should only contain digits 01234", res)
 		}
 	}
-}
-
-func ExampleGenerate() {
-	res, err := Generate(64, 10, 10, false, false)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Print(res)
-}
-
-func ExampleMustGenerate() {
-	// Will panic on error
-	res := MustGenerate(64, 10, 10, false, false)
-	log.Print(res)
-}
-
-func ExampleGenerator_Generate() {
-	gen, err := NewGenerator(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, err := gen.Generate(64, 10, 10, false, false)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Print(res)
-}
-
-func ExampleNewGenerator_nil() {
-	// This is exactly the same as calling "Generate" directly. It will use all
-	// the default values.
-	gen, err := NewGenerator(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_ = gen // gen.Generate(...)
-}
-
-func ExampleNewGenerator_custom() {
-	// Customize the list of symbols.
-	gen, err := NewGenerator(&GeneratorInput{
-		Symbols: "!@#$%^()",
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_ = gen // gen.Generate(...)
 }

@@ -17,6 +17,17 @@ import (
 	"strings"
 )
 
+// Built-time checks that the generators implement the interface.
+var _ PasswordGenerator = (*Generator)(nil)
+
+// PasswordGenerator is an interface that implements the Generate function. This
+// is useful for testing where you can pass this interface instead of a real
+// password generator to mock responses for predicability.
+type PasswordGenerator interface {
+	Generate(int, int, int, bool, bool) (string, error)
+	MustGenerate(int, int, int, bool, bool) string
+}
+
 const (
 	// LowerLetters is the list of lowercase letters.
 	LowerLetters = "abcdefghijklmnopqrstuvwxyz"
