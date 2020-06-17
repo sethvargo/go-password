@@ -1,13 +1,28 @@
 package password
 
 import (
+	"io"
 	"strings"
+	"sync/atomic"
 	"testing"
+)
+
+type (
+	MockReader struct {
+		Counter int64
+	}
 )
 
 const (
 	N = 10000
 )
+
+func (mr *MockReader) Read(data []byte) (int, error) {
+	for i := 0; i < len(data); i++ {
+		data[i] = byte(atomic.AddInt64(&mr.Counter, 1))
+	}
+	return len(data), nil
+}
 
 func testHasDuplicates(tb testing.TB, s string) bool {
 	found := make(map[rune]struct{}, len(s))
@@ -20,10 +35,13 @@ func testHasDuplicates(tb testing.TB, s string) bool {
 	return false
 }
 
-func TestGenerator_Generate(t *testing.T) {
+func testGenerator_Generate(t *testing.T, reader io.Reader) {
 	t.Parallel()
 
 	gen, err := NewGenerator(nil)
+	if reader != nil {
+		gen.reader = reader
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,7 +126,15 @@ func TestGenerator_Generate(t *testing.T) {
 	})
 }
 
-func TestGenerator_Generate_Custom(t *testing.T) {
+func TestGenerator_Generate(t *testing.T) {
+	testGenerator_Generate(t, nil)
+}
+
+func TestGenerator_Reader_Generate(t *testing.T) {
+	testGenerator_Generate(t, &MockReader{})
+}
+
+func testGenerator_Generate_Custom(t *testing.T, reader io.Reader) {
 	t.Parallel()
 
 	gen, err := NewGenerator(&GeneratorInput{
@@ -116,6 +142,7 @@ func TestGenerator_Generate_Custom(t *testing.T) {
 		UpperLetters: "ABCDE",
 		Symbols:      "!@#$%",
 		Digits:       "01234",
+		Reader:       reader,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -143,4 +170,12 @@ func TestGenerator_Generate_Custom(t *testing.T) {
 			t.Errorf("%q should only contain digits 01234", res)
 		}
 	}
+}
+
+func TestGenerator_Generate_Custom(t *testing.T) {
+	testGenerator_Generate_Custom(t, nil)
+}
+
+func TestGenerator_Reader_Generate_Custom(t *testing.T) {
+	testGenerator_Generate_Custom(t, &MockReader{})
 }
