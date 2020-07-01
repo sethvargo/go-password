@@ -49,27 +49,35 @@ func testGenerator_Generate(t *testing.T, reader io.Reader) {
 	t.Run("exceeds_length", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(0, 1, 0, false, false); err != ErrExceedsTotalLength {
+		if _, err := gen.Generate(0, 1, 0, 0, false); err != ErrExceedsTotalLength {
 			t.Errorf("expected %q to be %q", err, ErrExceedsTotalLength)
 		}
 
-		if _, err := gen.Generate(0, 0, 1, false, false); err != ErrExceedsTotalLength {
+		if _, err := gen.Generate(0, 0, 1, 0, false); err != ErrExceedsTotalLength {
 			t.Errorf("expected %q to be %q", err, ErrExceedsTotalLength)
 		}
 	})
 
-	t.Run("exceeds_letters_available", func(t *testing.T) {
+	t.Run("exceeds_lowerletters_available", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(1000, 0, 0, false, false); err != ErrLettersExceedsAvailable {
-			t.Errorf("expected %q to be %q", err, ErrLettersExceedsAvailable)
+		if _, err := gen.Generate(1000, 0, 0, 0, false); err != ErrLowerLettersExceedsAvailable {
+			t.Errorf("expected %q to be %q", err, ErrLowerLettersExceedsAvailable)
+		}
+	})
+
+	t.Run("exceeds_upperletters_available", func(t *testing.T) {
+		t.Parallel()
+
+		if _, err := gen.Generate(1000, 0, 0, 1000, false); err != ErrUpperLettersExceedsAvailable {
+			t.Errorf("expected %q to be %q", err, ErrUpperLettersExceedsAvailable)
 		}
 	})
 
 	t.Run("exceeds_digits_available", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(52, 11, 0, false, false); err != ErrDigitsExceedsAvailable {
+		if _, err := gen.Generate(52, 11, 0, 0, false); err != ErrDigitsExceedsAvailable {
 			t.Errorf("expected %q to be %q", err, ErrDigitsExceedsAvailable)
 		}
 	})
@@ -77,36 +85,8 @@ func testGenerator_Generate(t *testing.T, reader io.Reader) {
 	t.Run("exceeds_symbols_available", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(52, 0, 31, false, false); err != ErrSymbolsExceedsAvailable {
+		if _, err := gen.Generate(52, 0, 31, 0, false); err != ErrSymbolsExceedsAvailable {
 			t.Errorf("expected %q to be %q", err, ErrSymbolsExceedsAvailable)
-		}
-	})
-
-	t.Run("gen_lowercase", func(t *testing.T) {
-		t.Parallel()
-
-		for i := 0; i < N; i++ {
-			res, err := gen.Generate(i%len(LowerLetters), 0, 0, true, true)
-			if err != nil {
-				t.Error(err)
-			}
-
-			if res != strings.ToLower(res) {
-				t.Errorf("%q is not lowercase", res)
-			}
-		}
-	})
-
-	t.Run("gen_uppercase", func(t *testing.T) {
-		t.Parallel()
-
-		res, err := gen.Generate(1000, 0, 0, false, true)
-		if err != nil {
-			t.Error(err)
-		}
-
-		if res == strings.ToLower(res) {
-			t.Errorf("%q does not include uppercase", res)
 		}
 	})
 
@@ -114,7 +94,7 @@ func testGenerator_Generate(t *testing.T, reader io.Reader) {
 		t.Parallel()
 
 		for i := 0; i < N; i++ {
-			res, err := gen.Generate(52, 10, 30, false, false)
+			res, err := gen.Generate(92, 10, 30, 26, false)
 			if err != nil {
 				t.Error(err)
 			}
@@ -149,7 +129,7 @@ func testGenerator_Generate_Custom(t *testing.T, reader io.Reader) {
 	}
 
 	for i := 0; i < N; i++ {
-		res, err := gen.Generate(52, 10, 10, false, true)
+		res, err := gen.Generate(52, 10, 10, 26, true)
 		if err != nil {
 			t.Error(err)
 		}
