@@ -35,7 +35,7 @@ func testHasDuplicates(tb testing.TB, s string) bool {
 	return false
 }
 
-func testGenerator_Generate(t *testing.T, reader io.Reader) {
+func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Parallel()
 
 	gen, err := NewGenerator(nil)
@@ -126,15 +126,15 @@ func testGenerator_Generate(t *testing.T, reader io.Reader) {
 	})
 }
 
-func TestGenerator_Generate(t *testing.T) {
-	testGenerator_Generate(t, nil)
+func TestGeneratorGenerate(t *testing.T) {
+	testGeneratorGenerate(t, nil)
 }
 
 func TestGenerator_Reader_Generate(t *testing.T) {
-	testGenerator_Generate(t, &MockReader{})
+	testGeneratorGenerate(t, &MockReader{})
 }
 
-func testGenerator_Generate_Custom(t *testing.T, reader io.Reader) {
+func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 	t.Parallel()
 
 	gen, err := NewGenerator(&GeneratorInput{
@@ -172,10 +172,10 @@ func testGenerator_Generate_Custom(t *testing.T, reader io.Reader) {
 	}
 }
 
-func TestGenerator_Generate_Custom(t *testing.T) {
-	testGenerator_Generate_Custom(t, nil)
+func TestGeneratorGenerateCustom(t *testing.T) {
+	testGeneratorGenerateCustom(t, nil)
 }
 
 func TestGenerator_Reader_Generate_Custom(t *testing.T) {
-	testGenerator_Generate_Custom(t, &MockReader{})
+	testGeneratorGenerateCustom(t, &MockReader{})
 }
