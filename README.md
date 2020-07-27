@@ -1,7 +1,7 @@
 ## Golang Password Generator
 
-[![Build Status](https://travis-ci.org/sethvargo/go-password.svg?branch=master)](https://travis-ci.org/sethvargo/go-password)
-[![GoDoc](https://godoc.org/github.com/sethvargo/go-password?status.svg)](https://godoc.org/github.com/sethvargo/go-password)
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://pkg.go.dev/github.com/sethvargo/go-password/password)
+[![GitHub Actions](https://img.shields.io/github/workflow/status/sethvargo/go-password/Test?style=flat-square)](https://github.com/sethvargo/go-password/actions?query=workflow%3ATest)
 
 This library implements generation of random passwords with provided
 requirements as described by  [AgileBits
