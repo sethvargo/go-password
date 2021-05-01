@@ -15,6 +15,7 @@ import (
 	"errors"
 	"io"
 	"math/big"
+	"os"
 	"strings"
 )
 
@@ -235,6 +236,17 @@ func MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) 
 		panic(err)
 	}
 	return res
+}
+
+// GenerateIfNotInEnv generates a password, if specified env is empty
+func GenerateIfNotInEnv(env string, length, numDigits, numSymbols int, noUpper, allowRepeat bool) (pw string, err error) {
+	if envPassword, isSet := os.LookupEnv(env); isSet {
+		pw = envPassword
+	} else {
+		return Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+	}
+
+	return
 }
 
 // randomInsert randomly inserts the given value into the given string.
