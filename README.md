@@ -21,6 +21,8 @@ Q795Im1VR5h363s48oZGaLDa
 wpvbxlsc
 ```
 
+> Since these are completely randomized, it's possible that they may generate passwords that don't comply with some custom password policies, such as ones that require both upper case AND lower case letters. If your particular use case needs a mix of casing, then you can either increase the number of characters in the password or check the output and regenerate if it fails a particular constraint, such as requiring both upper and lower case.
+
 ## Installation
 
 ```sh
