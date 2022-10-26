@@ -1,0 +1,119 @@
+run:
+  # default: '1m'
+  timeout: '5m'
+
+  # default: []
+  build-tags: []
+
+  # default: ''
+  modules-download-mode: 'readonly'
+
+  # default: false
+  allow-parallel-runners: true
+
+linters:
+  enable:
+  - 'asasalint'
+  - 'asciicheck'
+  - 'bidichk'
+  - 'bodyclose'
+  - 'containedctx'
+  - 'contextcheck'
+  - 'cyclop'
+  - 'decorder'
+  - 'depguard'
+  - 'dogsled'
+  - 'dupl'
+  - 'dupword'
+  - 'durationcheck'
+  - 'errcheck'
+  - 'errchkjson'
+  - 'errname'
+  - 'errorlint'
+  - 'execinquery'
+  - 'exhaustive'
+  - 'exhaustruct'
+  - 'exportloopref'
+  - 'forbidigo'
+  - 'forcetypeassert'
+  - 'funlen'
+  - 'gci'
+  - 'gochecknoglobals'
+  - 'gochecknoinits'
+  - 'gocognit'
+  - 'goconst'
+  - 'gocritic'
+  - 'gocyclo'
+  - 'godot'
+  - 'godox'
+  - 'goerr113'
+  - 'gofumpt'
+  - 'goheader'
+  - 'goimports'
+  - 'gomnd'
+  - 'gomoddirectives'
+  - 'gomodguard'
+  - 'goprintffuncname'
+  - 'gosec'
+  - 'gosimple'
+  - 'govet'
+  - 'grouper'
+  - 'importas'
+  - 'ineffassign'
+  - 'interfacebloat'
+  - 'ireturn'
+  - 'lll'
+  - 'loggercheck'
+  - 'maintidx'
+  - 'makezero'
+  - 'misspell'
+  - 'nakedret'
+  - 'nestif'
+  - 'nilerr'
+  - 'nilnil'
+  - 'nlreturn'
+  - 'noctx'
+  - 'nolintlint'
+  - 'nonamedreturns'
+  - 'nosprintfhostport'
+  - 'paralleltest'
+  - 'prealloc'
+  - 'predeclared'
+  - 'promlinter'
+  - 'reassign'
+  - 'revive'
+  - 'rowserrcheck'
+  - 'sqlclosecheck'
+  - 'staticcheck'
+  - 'stylecheck'
+  - 'tagliatelle'
+  - 'tenv'
+  - 'testableexamples'
+  - 'testpackage'
+  - 'thelper'
+  - 'tparallel'
+  - 'typecheck'
+  - 'unconvert'
+  - 'unparam'
+  - 'unused'
+  - 'usestdlibvars'
+  - 'varnamelen'
+  - 'wastedassign'
+  - 'whitespace'
+  - 'wrapcheck'
+  - 'wsl'
+
+issues:
+  # default: []
+  exclude:
+  - '^SA3000:' # staticcheck: not required in Go 11.4+
+
+  # default: 50
+  max-issues-per-linter: 0
+
+  # default: 3
+  max-same-issues: 0
+
+severity:
+  # default: ''
+  default-severity: error
