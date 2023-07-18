@@ -142,6 +142,7 @@ func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 		UpperLetters: "ABCDE",
 		Symbols:      "!@#$%",
 		Digits:       "01234",
+		Exclude:      "aA@2",
 		Reader:       reader,
 	})
 	if err != nil {
@@ -149,7 +150,7 @@ func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 	}
 
 	for i := 0; i < N; i++ {
-		res, err := gen.Generate(52, 10, 10, false, true)
+		res, err := gen.Generate(52, 10, 10, false, true, "a")
 		if err != nil {
 			t.Error(err)
 		}
@@ -168,6 +169,22 @@ func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 
 		if strings.Contains(res, "5") {
 			t.Errorf("%q should only contain digits 01234", res)
+		}
+
+		if strings.Contains(res, "2") {
+			t.Errorf("%q should exclude digit 2 ", res)
+		}
+
+		if strings.Contains(res, "@") {
+			t.Errorf("%q should exclude symbol @ ", res)
+		}
+
+		if strings.Contains(res, "a") {
+			t.Errorf("%q should exclude lower letters a ", res)
+		}
+
+		if strings.Contains(res, "A") {
+			t.Errorf("%q should exclude upper letter A ", res)
 		}
 	}
 }

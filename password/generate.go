@@ -1,11 +1,11 @@
 // Package password provides a library for generating high-entropy random
 // password strings via the crypto/rand package.
 //
-//    res, err := Generate(64, 10, 10, false, false)
-//    if err != nil  {
-//      log.Fatal(err)
-//    }
-//    log.Printf(res)
+//	res, err := Generate(64, 10, 10, false, false)
+//	if err != nil  {
+//	  log.Fatal(err)
+//	}
+//	log.Printf(res)
 //
 // Most functions are safe for concurrent use.
 package password
@@ -41,6 +41,8 @@ const (
 
 	// Symbols is the list of symbols.
 	Symbols = "~!@#$%^&*()_+`-={}|[]\\:\"<>?,./"
+
+	Exclude = ""
 )
 
 var (
@@ -68,6 +70,7 @@ type Generator struct {
 	upperLetters string
 	digits       string
 	symbols      string
+	exclude      string
 	reader       io.Reader
 }
 
@@ -77,6 +80,7 @@ type GeneratorInput struct {
 	UpperLetters string
 	Digits       string
 	Symbols      string
+	Exclude      string
 	Reader       io.Reader // rand.Reader by default
 }
 
@@ -93,7 +97,24 @@ func NewGenerator(i *GeneratorInput) (*Generator, error) {
 		upperLetters: i.UpperLetters,
 		digits:       i.Digits,
 		symbols:      i.Symbols,
+		exclude:      i.Exclude,
 		reader:       i.Reader,
+	}
+
+	//Find where to exclude characters
+	for _, c := range g.exclude {
+		if strings.Contains(g.lowerLetters, string(c)) {
+			g.lowerLetters = strings.Replace(g.lowerLetters, string(c), "", -1)
+		}
+		if strings.Contains(g.upperLetters, string(c)) {
+			g.upperLetters = strings.Replace(g.upperLetters, string(c), "", -1)
+		}
+		if strings.Contains(g.digits, string(c)) {
+			g.digits = strings.Replace(g.digits, string(c), "", -1)
+		}
+		if strings.Contains(g.symbols, string(c)) {
+			g.symbols = strings.Replace(g.symbols, string(c), "", -1)
+		}
 	}
 
 	if g.lowerLetters == "" {
@@ -112,6 +133,10 @@ func NewGenerator(i *GeneratorInput) (*Generator, error) {
 		g.symbols = Symbols
 	}
 
+	if g.exclude == "" {
+		g.exclude = Exclude
+	}
+
 	if g.reader == nil {
 		g.reader = rand.Reader
 	}
@@ -127,10 +152,15 @@ func NewGenerator(i *GeneratorInput) (*Generator, error) {
 //
 // The algorithm is fast, but it's not designed to be performant; it favors
 // entropy over speed. This function is safe for concurrent use.
-func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
+func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool, exclude string) (string, error) {
 	letters := g.lowerLetters
 	if !noUpper {
 		letters += g.upperLetters
+	}
+	for _, c := range exclude {
+		if strings.Contains(letters, string(c)) {
+			letters = strings.Replace(letters, string(c), "", -1)
+		}
 	}
 
 	chars := length - numDigits - numSymbols
@@ -171,8 +201,15 @@ func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRe
 	}
 
 	// Digits
+	var digits string
+	for _, c := range exclude {
+		if strings.Contains(letters, string(c)) {
+			digits = strings.Replace(letters, string(c), "", -1)
+		}
+	}
+
 	for i := 0; i < numDigits; i++ {
-		d, err := randomElement(g.reader, g.digits)
+		d, err := randomElement(g.reader, digits)
 		if err != nil {
 			return "", err
 		}
@@ -189,6 +226,12 @@ func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRe
 	}
 
 	// Symbols
+	var symbols string
+	for _, c := range exclude {
+		if strings.Contains(letters, string(c)) {
+			symbols = strings.Replace(letters, string(c), "", -1)
+		}
+	}
 	for i := 0; i < numSymbols; i++ {
 		sym, err := randomElement(g.reader, g.symbols)
 		if err != nil {
