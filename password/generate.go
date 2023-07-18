@@ -25,8 +25,8 @@ var _ PasswordGenerator = (*Generator)(nil)
 // is useful for testing where you can pass this interface instead of a real
 // password generator to mock responses for predicability.
 type PasswordGenerator interface {
-	Generate(int, int, int, bool, bool) (string, error)
-	MustGenerate(int, int, int, bool, bool) string
+	Generate(int, int, int, bool, bool, string) (string, error)
+	MustGenerate(int, int, int, bool, bool, string) string
 }
 
 const (
@@ -201,10 +201,10 @@ func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRe
 	}
 
 	// Digits
-	var digits string
+	digits := g.digits
 	for _, c := range exclude {
-		if strings.Contains(letters, string(c)) {
-			digits = strings.Replace(letters, string(c), "", -1)
+		if strings.Contains(digits, string(c)) {
+			digits = strings.Replace(digits, string(c), "", -1)
 		}
 	}
 
@@ -226,14 +226,15 @@ func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRe
 	}
 
 	// Symbols
-	var symbols string
+	symbols := g.symbols
 	for _, c := range exclude {
-		if strings.Contains(letters, string(c)) {
-			symbols = strings.Replace(letters, string(c), "", -1)
+		if strings.Contains(symbols, string(c)) {
+			symbols = strings.Replace(symbols, string(c), "", -1)
 		}
 	}
+
 	for i := 0; i < numSymbols; i++ {
-		sym, err := randomElement(g.reader, g.symbols)
+		sym, err := randomElement(g.reader, symbols)
 		if err != nil {
 			return "", err
 		}
@@ -253,8 +254,8 @@ func (g *Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRe
 }
 
 // MustGenerate is the same as Generate, but panics on error.
-func (g *Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
-	res, err := g.Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+func (g *Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool, exclude string) string {
+	res, err := g.Generate(length, numDigits, numSymbols, noUpper, allowRepeat, "")
 	if err != nil {
 		panic(err)
 	}
@@ -262,18 +263,18 @@ func (g *Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, all
 }
 
 // Generate is the package shortcut for Generator.Generate.
-func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
+func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool, exclude string) (string, error) {
 	gen, err := NewGenerator(nil)
 	if err != nil {
 		return "", err
 	}
 
-	return gen.Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+	return gen.Generate(length, numDigits, numSymbols, noUpper, allowRepeat, exclude)
 }
 
 // MustGenerate is the package shortcut for Generator.MustGenerate.
-func MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
-	res, err := Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+func MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool, exclude string) string {
+	res, err := Generate(length, numDigits, numSymbols, noUpper, allowRepeat, exclude)
 	if err != nil {
 		panic(err)
 	}

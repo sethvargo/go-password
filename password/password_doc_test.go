@@ -8,7 +8,7 @@ import (
 )
 
 func ExampleGenerate() {
-	res, err := password.Generate(64, 10, 10, false, false)
+	res, err := password.Generate(64, 10, 10, false, false, "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,7 +17,7 @@ func ExampleGenerate() {
 
 func ExampleMustGenerate() {
 	// Will panic on error
-	res := password.MustGenerate(64, 10, 10, false, false)
+	res := password.MustGenerate(64, 10, 10, false, false, "")
 	log.Print(res)
 }
 
@@ -27,7 +27,7 @@ func ExampleGenerator_Generate() {
 		log.Fatal(err)
 	}
 
-	res, err := gen.Generate(64, 10, 10, false, false)
+	res, err := gen.Generate(64, 10, 10, false, false, "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func ExampleNewMockGenerator_testing() {
 	// password.Generator struct.
 	f := func(g password.PasswordGenerator) string {
 		// These values don't matter
-		return g.MustGenerate(1, 2, 3, false, false)
+		return g.MustGenerate(1, 2, 3, false, false, "")
 	}
 
 	// In tests

@@ -23,7 +23,7 @@ func NewMockGenerator(result string, err error) *mockGenerator {
 }
 
 // Generate returns the mocked result or error.
-func (g *mockGenerator) Generate(int, int, int, bool, bool) (string, error) {
+func (g *mockGenerator) Generate(int, int, int, bool, bool, string) (string, error) {
 	if g.err != nil {
 		return "", g.err
 	}
@@ -31,7 +31,7 @@ func (g *mockGenerator) Generate(int, int, int, bool, bool) (string, error) {
 }
 
 // MustGenerate returns the mocked result or panics if an error was given.
-func (g *mockGenerator) MustGenerate(int, int, int, bool, bool) string {
+func (g *mockGenerator) MustGenerate(int, int, int, bool, bool, string) string {
 	if g.err != nil {
 		panic(g.err)
 	}
