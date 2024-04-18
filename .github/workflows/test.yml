@@ -3,93 +3,57 @@ name: Test
 on:
   push:
     branches:
-    - main
-    tags:
-    - '*'
+      - main
   pull_request:
     branches:
-    - main
+      - main
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
+  cancel-in-progress: true
 
 jobs:
   lint:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
 
-    - uses: 'actions/setup-go@v3'
-      with:
-        go-version: '1.14'
+      - uses: 'actions/setup-go@v5'
+        with:
+          cache: false
+          go-version-file: 'go.mod'
 
-    - uses: 'golangci/golangci-lint-action@v3'
-      with:
-        version: 'v1.50.1'
-        only-new-issues: true
-        skip-cache: true
-        skip-pkg-cache: true
-        skip-build-cache: true
-        args: >-
-          --enable=${{ join(fromJson('[
-            "asciicheck",
-            "bidichk",
-            "bodyclose",
-            "containedctx",
-            "depguard",
-            "dogsled",
-            "errcheck",
-            "errchkjson",
-            "errname",
-            "errorlint",
-            "exhaustive",
-            "exportloopref",
-            "forcetypeassert",
-            "godot",
-            "gofumpt",
-            "goheader",
-            "goimports",
-            "gomodguard",
-            "goprintffuncname",
-            "gosec",
-            "gosimple",
-            "govet",
-            "ifshort",
-            "ineffassign",
-            "makezero",
-            "noctx",
-            "nolintlint",
-            "prealloc",
-            "predeclared",
-            "revive",
-            "sqlclosecheck",
-            "staticcheck",
-            "stylecheck",
-            "tenv",
-            "thelper",
-            "tparallel",
-            "typecheck",
-            "unconvert",
-            "unused",
-            "whitespace",
-          ]'), ',') }}
-          --max-issues-per-linter=0
-          --max-same-issues=0
-          --timeout=5m
+      - uses: 'golangci/golangci-lint-action@v4'
+        with:
+          version: 'v1.57.2'
+          skip-cache: true
 
   test:
     strategy:
       matrix:
         platform:
-        - 'macos-latest'
-        - 'ubuntu-latest'
-        - 'windows-latest'
+          - 'macos-latest'
+          - 'ubuntu-latest'
+          - 'windows-latest'
+      fail-fast: false
 
     runs-on: '${{ matrix.platform }}'
 
     steps:
-    - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
 
-    - uses: 'actions/setup-go@v3'
-      with:
-        go-version: '1.14'
+      - uses: 'actions/setup-go@v5'
+        with:
+          cache: false
+          go-version-file: 'go.mod'
 
-    - run: 'make test-acc'
+      - shell: 'bash'
+        run: |-
+          go test \
+            -count=1 \
+            -race \
+            -shuffle=on \
+            -timeout=5m \
+            -vet=all \
+            ./...
