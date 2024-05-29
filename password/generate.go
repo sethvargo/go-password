@@ -32,10 +32,10 @@ type PasswordGenerator interface {
 
 const (
 	// LowerLetters is the list of lowercase letters.
-	LowerLetters = "abcdefghijklmnopqrstuvwxyz"
+	LowerLetters = "abcdefghijklmnñopqrstuvwxyz"
 
 	// UpperLetters is the list of uppercase letters.
-	UpperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	UpperLetters = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
 
 	// Digits is the list of permitted digits.
 	Digits = "0123456789"
