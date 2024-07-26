@@ -1,7 +1,6 @@
 package password_test
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/sethvargo/go-password/password"
@@ -22,11 +21,7 @@ func ExampleMustGenerate() {
 }
 
 func ExampleGenerator_Generate() {
-	gen, err := password.NewGenerator(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	gen := password.NewGenerator()
 	res, err := gen.Generate(64, 10, 10, false, false)
 	if err != nil {
 		log.Fatal(err)
@@ -37,37 +32,12 @@ func ExampleGenerator_Generate() {
 func ExampleNewGenerator_nil() {
 	// This is exactly the same as calling "Generate" directly. It will use all
 	// the default values.
-	gen, err := password.NewGenerator(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	gen := password.NewGenerator()
 	_ = gen // gen.Generate(...)
 }
 
 func ExampleNewGenerator_custom() {
 	// Customize the list of symbols.
-	gen, err := password.NewGenerator(&password.GeneratorInput{
-		Symbols: "!@#$%^()",
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	gen := password.NewGenerator().WithSymbols("!@#$%^()")
 	_ = gen // gen.Generate(...)
-}
-
-func ExampleNewMockGenerator_testing() {
-	// Accept a password.PasswordGenerator interface instead of a
-	// password.Generator struct.
-	f := func(g password.PasswordGenerator) string {
-		// These values don't matter
-		return g.MustGenerate(1, 2, 3, false, false)
-	}
-
-	// In tests
-	gen := password.NewMockGenerator("canned-response", nil)
-
-	fmt.Print(f(gen))
-	// Output: canned-response
 }

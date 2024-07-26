@@ -41,14 +41,7 @@ func testHasDuplicates(tb testing.TB, s string) bool {
 func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Helper()
 
-	gen, err := NewGenerator(nil)
-	if reader != nil {
-		gen.reader = reader
-	}
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	gen := NewGenerator()
 	t.Run("exceeds_length", func(t *testing.T) {
 		t.Parallel()
 
@@ -142,16 +135,11 @@ func TestGenerator_Reader_Generate(t *testing.T) {
 func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 	t.Helper()
 
-	gen, err := NewGenerator(&GeneratorInput{
-		LowerLetters: "abcde",
-		UpperLetters: "ABCDE",
-		Symbols:      "!@#$%",
-		Digits:       "01234",
-		Reader:       reader,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	gen := NewGenerator().
+		WithLowerLetters("abcde").
+		WithUpperLetters("ABCDE").
+		WithSymbols("!@#$%").
+		WithDigits("01234")
 
 	for i := 0; i < N; i++ {
 		res, err := gen.Generate(52, 10, 10, false, true)
