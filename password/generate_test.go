@@ -2,28 +2,13 @@ package password
 
 import (
 	"errors"
-	"io"
 	"strings"
-	"sync/atomic"
 	"testing"
-)
-
-type (
-	MockReader struct {
-		Counter int64
-	}
 )
 
 const (
 	N = 10000
 )
-
-func (mr *MockReader) Read(data []byte) (int, error) {
-	for i := 0; i < len(data); i++ {
-		data[i] = byte(atomic.AddInt64(&mr.Counter, 1))
-	}
-	return len(data), nil
-}
 
 func testHasDuplicates(tb testing.TB, s string) bool {
 	tb.Helper()
@@ -38,18 +23,22 @@ func testHasDuplicates(tb testing.TB, s string) bool {
 	return false
 }
 
-func testGeneratorGenerate(t *testing.T, reader io.Reader) {
+func testGeneratorGenerate(t *testing.T) {
 	t.Helper()
 
 	gen := NewGenerator()
 	t.Run("exceeds_length", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(0, 1, 0, false, false); !errors.Is(err, ErrExceedsTotalLength) {
+		if _, err := gen.Generate(Input{
+			Digits: 1,
+		}); !errors.Is(err, ErrExceedsTotalLength) {
 			t.Errorf("expected %q to be %q", err, ErrExceedsTotalLength)
 		}
 
-		if _, err := gen.Generate(0, 0, 1, false, false); !errors.Is(err, ErrExceedsTotalLength) {
+		if _, err := gen.Generate(Input{
+			Symbols: 1,
+		}); !errors.Is(err, ErrExceedsTotalLength) {
 			t.Errorf("expected %q to be %q", err, ErrExceedsTotalLength)
 		}
 	})
@@ -57,7 +46,9 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Run("exceeds_letters_available", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(1000, 0, 0, false, false); !errors.Is(err, ErrLettersExceedsAvailable) {
+		if _, err := gen.Generate(Input{
+			Length: 1000,
+		}); !errors.Is(err, ErrLettersExceedsAvailable) {
 			t.Errorf("expected %q to be %q", err, ErrLettersExceedsAvailable)
 		}
 	})
@@ -65,7 +56,10 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Run("exceeds_digits_available", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(52, 11, 0, false, false); !errors.Is(err, ErrDigitsExceedsAvailable) {
+		if _, err := gen.Generate(Input{
+			Length: 52,
+			Digits: 11,
+		}); !errors.Is(err, ErrDigitsExceedsAvailable) {
 			t.Errorf("expected %q to be %q", err, ErrDigitsExceedsAvailable)
 		}
 	})
@@ -73,7 +67,10 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Run("exceeds_symbols_available", func(t *testing.T) {
 		t.Parallel()
 
-		if _, err := gen.Generate(52, 0, 31, false, false); !errors.Is(err, ErrSymbolsExceedsAvailable) {
+		if _, err := gen.Generate(Input{
+			Length:  52,
+			Symbols: 31,
+		}); !errors.Is(err, ErrSymbolsExceedsAvailable) {
 			t.Errorf("expected %q to be %q", err, ErrSymbolsExceedsAvailable)
 		}
 	})
@@ -82,7 +79,11 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 		t.Parallel()
 
 		for i := 0; i < N; i++ {
-			res, err := gen.Generate(i%len(LowerLetters), 0, 0, true, true)
+			res, err := gen.Generate(Input{
+				Length:      i % len(LowerLetters),
+				NoUpper:     true,
+				AllowRepeat: true,
+			})
 			if err != nil {
 				t.Error(err)
 			}
@@ -96,7 +97,10 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Run("gen_uppercase", func(t *testing.T) {
 		t.Parallel()
 
-		res, err := gen.Generate(1000, 0, 0, false, true)
+		res, err := gen.Generate(Input{
+			Length:      1000,
+			AllowRepeat: true,
+		})
 		if err != nil {
 			t.Error(err)
 		}
@@ -110,7 +114,11 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 		t.Parallel()
 
 		for i := 0; i < N; i++ {
-			res, err := gen.Generate(52, 10, 30, false, false)
+			res, err := gen.Generate(Input{
+				Length:  52,
+				Digits:  10,
+				Symbols: 30,
+			})
 			if err != nil {
 				t.Error(err)
 			}
@@ -124,15 +132,15 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 
 func TestGeneratorGenerate(t *testing.T) {
 	t.Parallel()
-	testGeneratorGenerate(t, nil)
+	testGeneratorGenerate(t)
 }
 
 func TestGenerator_Reader_Generate(t *testing.T) {
 	t.Parallel()
-	testGeneratorGenerate(t, &MockReader{})
+	testGeneratorGenerate(t)
 }
 
-func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
+func testGeneratorGenerateCustom(t *testing.T) {
 	t.Helper()
 
 	gen := NewGenerator().
@@ -142,7 +150,12 @@ func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 		WithDigits("01234")
 
 	for i := 0; i < N; i++ {
-		res, err := gen.Generate(52, 10, 10, false, true)
+		res, err := gen.Generate(Input{
+			Length:      52,
+			Digits:      10,
+			Symbols:     10,
+			AllowRepeat: true,
+		})
 		if err != nil {
 			t.Error(err)
 		}
@@ -167,10 +180,10 @@ func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 
 func TestGeneratorGenerateCustom(t *testing.T) {
 	t.Parallel()
-	testGeneratorGenerateCustom(t, nil)
+	testGeneratorGenerateCustom(t)
 }
 
 func TestGenerator_Reader_Generate_Custom(t *testing.T) {
 	t.Parallel()
-	testGeneratorGenerateCustom(t, &MockReader{})
+	testGeneratorGenerateCustom(t)
 }

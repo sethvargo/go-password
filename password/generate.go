@@ -59,6 +59,16 @@ type Generator struct {
 	symbols      string
 }
 
+// Input used to define input parameters for the generator
+type Input struct {
+	Length      int
+	Digits      int
+	Symbols     int
+	NoUpper     bool
+	AllowRepeat bool
+	_           struct{}
+}
+
 // NewGenerator creates a new Generator from the specified configuration. If no
 // input is given, all the default values are used. This function is safe for
 // concurrent use.
@@ -107,26 +117,26 @@ func (g Generator) WithSymbols(symbols string) Generator {
 //
 // The algorithm is fast, but it's not designed to be performant; it favors
 // entropy over speed. This function is safe for concurrent use.
-func (g Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
+func (g Generator) Generate(input Input) (string, error) {
 	letters := g.lowerLetters
-	if !noUpper {
+	if !input.NoUpper {
 		letters += g.upperLetters
 	}
 
-	chars := length - numDigits - numSymbols
+	chars := input.Length - input.Digits - input.Symbols
 	if chars < 0 {
 		return "", ErrExceedsTotalLength
 	}
 
-	if !allowRepeat && chars > len(letters) {
+	if !input.AllowRepeat && chars > len(letters) {
 		return "", ErrLettersExceedsAvailable
 	}
 
-	if !allowRepeat && numDigits > len(g.digits) {
+	if !input.AllowRepeat && input.Digits > len(g.digits) {
 		return "", ErrDigitsExceedsAvailable
 	}
 
-	if !allowRepeat && numSymbols > len(g.symbols) {
+	if !input.AllowRepeat && input.Symbols > len(g.symbols) {
 		return "", ErrSymbolsExceedsAvailable
 	}
 
@@ -139,7 +149,7 @@ func (g Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRep
 			return "", err
 		}
 
-		if !allowRepeat && strings.Contains(result, ch) {
+		if !input.AllowRepeat && strings.Contains(result, ch) {
 			i--
 			continue
 		}
@@ -151,13 +161,13 @@ func (g Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRep
 	}
 
 	// Digits
-	for i := 0; i < numDigits; i++ {
+	for i := 0; i < input.Digits; i++ {
 		d, err := randomElement(g.digits)
 		if err != nil {
 			return "", err
 		}
 
-		if !allowRepeat && strings.Contains(result, d) {
+		if !input.AllowRepeat && strings.Contains(result, d) {
 			i--
 			continue
 		}
@@ -169,13 +179,13 @@ func (g Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRep
 	}
 
 	// Symbols
-	for i := 0; i < numSymbols; i++ {
+	for i := 0; i < input.Symbols; i++ {
 		sym, err := randomElement(g.symbols)
 		if err != nil {
 			return "", err
 		}
 
-		if !allowRepeat && strings.Contains(result, sym) {
+		if !input.AllowRepeat && strings.Contains(result, sym) {
 			i--
 			continue
 		}
@@ -190,8 +200,8 @@ func (g Generator) Generate(length, numDigits, numSymbols int, noUpper, allowRep
 }
 
 // MustGenerate is the same as Generate, but panics on error.
-func (g Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
-	res, err := g.Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+func (g Generator) MustGenerate(input Input) string {
+	res, err := g.Generate(input)
 	if err != nil {
 		panic(err)
 	}
@@ -199,13 +209,13 @@ func (g Generator) MustGenerate(length, numDigits, numSymbols int, noUpper, allo
 }
 
 // Generate is the package shortcut for Generator.Generate.
-func Generate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) (string, error) {
-	return NewGenerator().Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+func Generate(input Input) (string, error) {
+	return NewGenerator().Generate(input)
 }
 
 // MustGenerate is the package shortcut for Generator.MustGenerate.
-func MustGenerate(length, numDigits, numSymbols int, noUpper, allowRepeat bool) string {
-	res, err := Generate(length, numDigits, numSymbols, noUpper, allowRepeat)
+func MustGenerate(input Input) string {
+	res, err := Generate(input)
 	if err != nil {
 		panic(err)
 	}

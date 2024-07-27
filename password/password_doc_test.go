@@ -7,7 +7,11 @@ import (
 )
 
 func ExampleGenerate() {
-	res, err := password.Generate(64, 10, 10, false, false)
+	res, err := password.Generate(password.Input{
+		Length:  64,
+		Digits:  10,
+		Symbols: 10,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -16,13 +20,21 @@ func ExampleGenerate() {
 
 func ExampleMustGenerate() {
 	// Will panic on error
-	res := password.MustGenerate(64, 10, 10, false, false)
+	res := password.MustGenerate(password.Input{
+		Length:  64,
+		Digits:  10,
+		Symbols: 10,
+	})
 	log.Print(res)
 }
 
 func ExampleGenerator_Generate() {
 	gen := password.NewGenerator()
-	res, err := gen.Generate(64, 10, 10, false, false)
+	res, err := gen.Generate(password.Input{
+		Length:  64,
+		Digits:  10,
+		Symbols: 10,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
