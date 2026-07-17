@@ -5,7 +5,7 @@
 
 This library implements generation of random passwords with provided
 requirements as described by  [AgileBits
-1Password](https://discussions.agilebits.com/discussion/23842/how-random-are-the-generated-passwords)
+1Password](https://1password.com/password-generator)
 in pure Golang. The algorithm is commonly used when generating website
 passwords.
 
