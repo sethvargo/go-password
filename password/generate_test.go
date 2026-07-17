@@ -10,7 +10,7 @@ import (
 
 type (
 	MockReader struct {
-		Counter int64
+		Counter atomic.Int64
 	}
 )
 
@@ -19,8 +19,8 @@ const (
 )
 
 func (mr *MockReader) Read(data []byte) (int, error) {
-	for i := 0; i < len(data); i++ {
-		data[i] = byte(atomic.AddInt64(&mr.Counter, 1))
+	for i := range data {
+		data[i] = byte(mr.Counter.Add(1))
 	}
 	return len(data), nil
 }
@@ -85,6 +85,18 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 		}
 	})
 
+	t.Run("negative_input", func(t *testing.T) {
+		t.Parallel()
+
+		if _, err := gen.Generate(10, -1, 0, false, false); !errors.Is(err, ErrNegativeInput) {
+			t.Errorf("expected %q to be %q", err, ErrNegativeInput)
+		}
+
+		if _, err := gen.Generate(10, 0, -1, false, false); !errors.Is(err, ErrNegativeInput) {
+			t.Errorf("expected %q to be %q", err, ErrNegativeInput)
+		}
+	})
+
 	t.Run("gen_lowercase", func(t *testing.T) {
 		t.Parallel()
 
@@ -116,7 +128,7 @@ func testGeneratorGenerate(t *testing.T, reader io.Reader) {
 	t.Run("gen_no_repeats", func(t *testing.T) {
 		t.Parallel()
 
-		for i := 0; i < N; i++ {
+		for range N {
 			res, err := gen.Generate(52, 10, 30, false, false)
 			if err != nil {
 				t.Error(err)
@@ -153,7 +165,7 @@ func testGeneratorGenerateCustom(t *testing.T, reader io.Reader) {
 		t.Fatal(err)
 	}
 
-	for i := 0; i < N; i++ {
+	for range N {
 		res, err := gen.Generate(52, 10, 10, false, true)
 		if err != nil {
 			t.Error(err)
