@@ -1,11 +1,11 @@
 ## Golang Password Generator
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://pkg.go.dev/github.com/sethvargo/go-password/password)
-[![GitHub Actions](https://img.shields.io/github/workflow/status/sethvargo/go-password/Test?style=flat-square)](https://github.com/sethvargo/go-password/actions?query=workflow%3ATest)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/sethvargo/go-password/test.yml?style=flat-square)](https://github.com/sethvargo/go-password/actions/workflows/test.yml)
 
 This library implements generation of random passwords with provided
 requirements as described by  [AgileBits
-1Password](https://discussions.agilebits.com/discussion/23842/how-random-are-the-generated-passwords)
+1Password](https://1password.com/password-generator)
 in pure Golang. The algorithm is commonly used when generating website
 passwords.
 
@@ -26,7 +26,7 @@ wpvbxlsc
 ## Installation
 
 ```sh
-$ go get -u github.com/sethvargo/go-password/password
+$ go get github.com/sethvargo/go-password/password
 ```
 
 ## Usage
@@ -47,11 +47,11 @@ func main() {
   if err != nil {
     log.Fatal(err)
   }
-  log.Printf(res)
+  log.Print(res)
 }
 ```
 
-See the [GoDoc](https://godoc.org/github.com/sethvargo/go-password) for more
+See the [GoDoc](https://pkg.go.dev/github.com/sethvargo/go-password/password) for more
 information.
 
 ## Testing

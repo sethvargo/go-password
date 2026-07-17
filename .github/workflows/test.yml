@@ -1,59 +1,39 @@
-name: Test
+name: 'Test'
 
 on:
   push:
     branches:
-      - main
+      - 'main'
+    tags:
+      - '*'
   pull_request:
     branches:
-      - main
+      - 'main'
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
   cancel-in-progress: true
 
 jobs:
-  lint:
-    runs-on: 'ubuntu-latest'
-
-    steps:
-      - uses: 'actions/checkout@v4'
-
-      - uses: 'actions/setup-go@v5'
-        with:
-          cache: false
-          go-version-file: 'go.mod'
-
-      - uses: 'golangci/golangci-lint-action@v4'
-        with:
-          version: 'v1.57.2'
-          skip-cache: true
-
   test:
     strategy:
+      fail-fast: false
       matrix:
         platform:
           - 'macos-latest'
           - 'ubuntu-latest'
           - 'windows-latest'
-      fail-fast: false
 
     runs-on: '${{ matrix.platform }}'
 
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0' # ratchet:actions/checkout@v7
 
-      - uses: 'actions/setup-go@v5'
+      - uses: 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' # ratchet:actions/setup-go@v7
         with:
-          cache: false
           go-version-file: 'go.mod'
 
-      - shell: 'bash'
+      - name: 'Test'
+        shell: 'bash'
         run: |-
-          go test \
-            -count=1 \
-            -race \
-            -shuffle=on \
-            -timeout=5m \
-            -vet=all \
-            ./...
+          make test
